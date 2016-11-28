@@ -23,6 +23,14 @@ module.exports = [
     prompt: true
   },
   {
+    name: 'uri',
+    question: 'Solid server uri (with protocol/hostname/port)',
+    help: "Solid server uri (default: 'https://localhost:8443')",
+    default: 'https://localhost:8443',
+    validate: validUri,
+    prompt: true
+  },
+  {
     name: 'webid',
     help: 'Enable WebID+TLS authentication (use `--no-webid` for HTTP instead of HTTPS)',
     flag: true,
@@ -49,6 +57,16 @@ module.exports = [
     }
   },
   {
+    name: 'oidc-issuer',
+    help: 'OpenID Connect Provider hostname',
+    prompt: true,
+    default: 'https://localhost:3000',
+    when: (answers) => {
+      return answers.auth === 'oidc'
+    }
+  },
+
+  {
     name: 'useOwner',
     question: 'Do you already have a WebID?',
     type: 'confirm',
@@ -59,12 +77,7 @@ module.exports = [
     name: 'owner',
     help: 'Set the owner of the storage',
     question: 'Your webid',
-    validate: function (value) {
-      if (value === '' || !value.startsWith('http')) {
-        return 'Enter a valid Webid'
-      }
-      return true
-    },
+    validate: validUri,
     when: function (answers) {
       return answers.useOwner
     }
@@ -138,14 +151,14 @@ module.exports = [
     hide: false
   },
 
-  {
-    name: 'data-browser-path',
-    help: 'An HTML file which is sent to allow users to browse the data (eg using mashlib.js)',
-    question: 'Path of data viewer page (defaults to using mashlib)',
-    validate: validPath,
-    default: 'default',
-    prompt: true
-  },
+  // {
+  //   name: 'data-browser-path',
+  //   help: 'An HTML file which is sent to allow users to browse the data (eg using mashlib.js)',
+  //   question: 'Path of data viewer page (defaults to using mashlib)',
+  //   validate: validPath,
+  //   default: 'default',
+  //   prompt: true
+  // },
   {
     name: 'suffix-acl',
     full: 'suffix-acl',
@@ -272,4 +285,11 @@ function validPath (value) {
       return resolve(true)
     })
   })
+}
+
+function validUri (value) {
+  if (value === '' || !value.startsWith('http')) {
+    return 'Enter a valid uri'
+  }
+  return true
 }

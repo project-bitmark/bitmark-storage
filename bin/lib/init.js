@@ -2,6 +2,7 @@ const inquirer = require('inquirer')
 const fs = require('fs')
 const options = require('./options')
 const camelize = require('camelize')
+const KVPFileStore = require('kvplus-files')
 
 var questions = options
   .map((option) => {
@@ -30,6 +31,13 @@ module.exports = function (program) {
 
       // Prompt to the user
       inquirer.prompt(questions)
+        .then((answers) => {
+          let store = new KVPFileStore()
+          return store.createCollection('clients')
+            .then(() => {
+              return answers
+            })
+        })
         .then((answers) => {
           // setting email
           if (answers.useEmail) {
@@ -65,6 +73,7 @@ module.exports = function (program) {
             }
             console.log('config created on', configPath)
           })
+
         })
         .catch((err) => {
           console.log('Error:', err)
