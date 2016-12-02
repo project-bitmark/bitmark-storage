@@ -9,3 +9,4 @@ npm-debug.log
 /.acl
 /config.json
 /settings
+db/
