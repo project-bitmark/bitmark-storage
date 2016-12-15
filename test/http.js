@@ -3,7 +3,6 @@ var fs = require('fs')
 var li = require('li')
 var ldnode = require('../index')
 var rm = require('./test-utils').rm
-var RSVP = require('rsvp')
 var path = require('path')
 
 var suffixAcl = '.acl'
@@ -14,16 +13,17 @@ var ldpServer = ldnode.createServer({
   root: path.join(__dirname, '/resources')
 })
 var server = supertest(ldpServer)
+var assert = require('chai').assert
 
 /**
  * Creates a new test basic container via an LDP POST
  *   (located in `test/resources/{containerName}`)
  * @method createTestContainer
  * @param containerName {String} Container name used as slug, no leading `/`
- * @return {RSVP.Promise} Promise obj, for use with Mocha's `before()` etc
+ * @return {Promise} Promise obj, for use with Mocha's `before()` etc
  */
 function createTestContainer (containerName) {
-  return new RSVP.Promise(function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     server.post('/')
       .set('content-type', 'text/turtle')
       .set('slug', containerName)
@@ -40,10 +40,10 @@ function createTestContainer (containerName) {
  *   (located in `test/resources/{resourceName}`)
  * @method createTestResource
  * @param resourceName {String} Resource name (should have a leading `/`)
- * @return {RSVP.Promise} Promise obj, for use with Mocha's `before()` etc
+ * @return {Promise} Promise obj, for use with Mocha's `before()` etc
  */
 function createTestResource (resourceName) {
-  return new RSVP.Promise(function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     server.put(resourceName)
       .set('content-type', 'text/turtle')
       .end(function (error, res) {
@@ -406,7 +406,7 @@ describe('HTTP APIs', function () {
   describe('DELETE API', function () {
     before(function () {
       // Ensure all these are finished before running tests
-      return RSVP.all([
+      return Promise.all([
         rm('/false-file-48484848'),
         createTestContainer('delete-test-empty-container'),
         createTestResource('/put-resource-1.ttl'),
@@ -451,7 +451,7 @@ describe('HTTP APIs', function () {
   describe('POST API', function () {
     before(function () {
       // Ensure all these are finished before running tests
-      return RSVP.all([
+      return Promise.all([
         createTestContainer('post-tests'),
         rm('post-test-target.ttl')
         // createTestResource('/put-resource-1.ttl'),
@@ -535,7 +535,7 @@ describe('HTTP APIs', function () {
           if (err) return done(err)
           var stats = fs.statSync(path.join(__dirname, '/resources/post-tests/loans/'))
           if (!stats.isDirectory()) {
-            return done(new Error('Cannot read file just created'))
+            return done(new Error('Cannot read container just created'))
           }
           done()
         })
@@ -545,9 +545,39 @@ describe('HTTP APIs', function () {
         .expect('content-type', /text\/turtle/)
         .expect(200, done)
     })
+
+    it('should create a container with a url name', (done) => {
+      let containerName = 'https://example.com/page'
+      let expectedDirName = '/post-tests/https%3A%2F%2Fexample.com%2Fpage/'
+      server.post('/post-tests/')
+        .set('slug', containerName)
+        .set('content-type', 'text/turtle')
+        .set('link', '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"')
+        .expect(201)
+        .end((err, res) => {
+          if (err) return done(err)
+          try {
+            assert.equal(res.headers.location, expectedDirName,
+              'Uri container names should be encoded')
+            let createdDir = fs.statSync(path.join(__dirname, 'resources', expectedDirName))
+            assert(createdDir.isDirectory(), 'Container should have been created')
+          } catch (err) {
+            return done(err)
+          }
+          done()
+        })
+    })
+
+    it('should be able to access new url-named container', (done) => {
+      let containerUrl = '/post-tests/https%3A%2F%2Fexample.com%2Fpage/'
+      server.get(containerUrl)
+        .expect('content-type', /text\/turtle/)
+        .expect(200, done)
+    })
+
     after(function () {
       // Clean up after POST API tests
-      return RSVP.all([
+      return Promise.all([
         rm('/post-tests/'),
         rm('post-test-target.ttl')
       ])
@@ -581,7 +611,7 @@ describe('HTTP APIs', function () {
       })
     after(function () {
       // Clean up after POST (multipart) API tests
-      return RSVP.all([
+      return Promise.all([
         rm('/sampleContainer/nicola.jpg'),
         rm('/sampleContainer/timbl.jpg')
       ])
