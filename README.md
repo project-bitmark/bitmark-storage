@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/project-bitmark/bitmark-storage.png?label=ready&title=Ready)](https://waffle.io/project-bitmark/bitmark-storage)
 # solid-server in Node
 
 [![](https://img.shields.io/badge/project-Solid-7C4DFF.svg?style=flat-square)](https://github.com/solid/solid)
