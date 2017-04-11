@@ -69,7 +69,7 @@
     "uuid": "^3.0.0",
     "valid-url": "^1.0.9",
     "vhost": "^3.0.2",
-    "webid": "^0.3.7"
+    "webid": "https://github.com/melvincarvalho/node-webid"
   },
   "devDependencies": {
     "chai": "^3.0.0",
