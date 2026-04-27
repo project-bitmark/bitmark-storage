@@ -91,10 +91,12 @@ Or `systemd`, `launchd`, etc. — same shape.
 
 ## License
 
-MIT (this wrapper). JSS is MIT too. Both are upstream-friendly forks of
-the broader Solid ecosystem.
+AGPL-3.0. © 2026 The Bitmark project and contributors.
+
+JSS, the upstream this wraps, is MIT-licensed.
 
 ## See also
 
 - [`project-bitmark/bitmark-os`](https://github.com/project-bitmark/bitmark-os) — the desktop OS that consumes this pod
-- [`JavaScriptSolidServer/JavaScriptSolidServer`](https://github.com/JavaScriptSolidServer/JavaScriptSolidServer) — the actual server
+- [`project-bitmark/bitmark-hub`](https://github.com/project-bitmark/bitmark-hub) — workspace UI for this pod
+- [`JavaScriptSolidServer/JavaScriptSolidServer`](https://github.com/JavaScriptSolidServer/JavaScriptSolidServer) — the upstream server
