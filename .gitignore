@@ -1,15 +1,4 @@
 node_modules/
-*~
+package-lock.json
+.DS_Store
 *.swp
-.tern-port
-npm-debug.log
-config/account-template
-config/email-templates
-/accounts
-/profile
-/inbox
-/.acl
-/config.json
-/settings
-.nyc_output
-coverage
